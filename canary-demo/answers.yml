@@ -33,7 +33,7 @@ traffic_test_results:
   actual_canary_percentage: 20% #TODO: Calculate the actual percentage of canary traffic
 
 # Prometheus Queries
-# Not able to get data on promethus
+# Not able to get data from prometheus
 prometheus_metrics:
   main_request_rate: #TODO: Enter the result of rate(http_requests_total{version="v1"}[5m])
   canary_request_rate: #TODO: Enter the result of rate(http_requests_total{version="v2"}[5m])
