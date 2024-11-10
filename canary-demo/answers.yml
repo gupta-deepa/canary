@@ -1,53 +1,94 @@
 # Deployment Information
 pods_status:
-  main_pods_running: #TODO: Enter number of main pods running
-  canary_pods_running: #TODO: Enter number of canary pods running
+  main_pods_running: 3 #TODO: Enter number of main pods running
+  canary_pods_running: 1 #TODO: Enter number of canary pods running
 
 # Service Information
 service_endpoints:
-  main_service_cluster_ip: #TODO: Enter the ClusterIP of main service
-  canary_service_cluster_ip: #TODO: Enter the ClusterIP of canary service
+  main_service_cluster_ip: 10.106.132.159 #TODO: Enter the ClusterIP of main service
+  canary_service_cluster_ip: 10.97.45.201 #TODO: Enter the ClusterIP of canary service
 
 # Ingress Information
 ingress_details:
-  address: #TODO: Enter the Ingress controller IP address
-  host: #TODO: Enter the configured host (should be canary-demo.local)
+  address: 192.168.49.2 #TODO: Enter the Ingress controller IP address
+  host: canary-demo.local #TODO: Enter the configured host (should be canary-demo.local)
 
 # Metrics
 main_deployment_metrics:
-  http_requests_total: #TODO: Enter the value from main deployment's /metrics endpoint
-  process_cpu_seconds_total: #TODO: Enter the CPU seconds from main deployment
-  process_resident_memory_bytes: #TODO: Enter the memory usage from main deployment
+  http_requests_total: 15.0 #TODO: Enter the value from main deployment's /metrics endpoint
+  process_cpu_seconds_total: 1.31 #TODO: Enter the CPU seconds from main deployment
+  process_resident_memory_bytes: 3.2428032e+07 #TODO: Enter the memory usage from main deployment
 
 canary_deployment_metrics:
-  http_requests_total: #TODO: Enter the value from canary deployment's /metrics endpoint
-  process_cpu_seconds_total: #TODO: Enter the CPU seconds from canary deployment
-  process_resident_memory_bytes: #TODO: Enter the memory usage from canary deployment
+  http_requests_total: 3.0 #TODO: Enter the value from canary deployment's /metrics endpoint
+  process_cpu_seconds_total: 0.36 #TODO: Enter the CPU seconds from canary deployment
+  process_resident_memory_bytes: 3.2825344e+07 #TODO: Enter the memory usage from canary deployment
 
 # Traffic Distribution Test
+# Result from running for [i in {1..20}; do curl -H "Host: canary-demo.local" localhost:8082; done]
 traffic_test_results:
-  total_requests_sent: #TODO: Enter how many test requests you sent (should be 20)
-  main_responses_received: #TODO: Enter how many responses were from main deployment
-  canary_responses_received: #TODO: Enter how many responses were from canary deployment
-  actual_canary_percentage: #TODO: Calculate the actual percentage of canary traffic
+  total_requests_sent: 20 #TODO: Enter how many test requests you sent (should be 20)
+  main_responses_received: 16 #TODO: Enter how many responses were from main deployment
+  canary_responses_received: 4 #TODO: Enter how many responses were from canary deployment
+  actual_canary_percentage: 20% #TODO: Calculate the actual percentage of canary traffic
 
 # Prometheus Queries
+# Not able to get data on promethus
 prometheus_metrics:
   main_request_rate: #TODO: Enter the result of rate(http_requests_total{version="v1"}[5m])
   canary_request_rate: #TODO: Enter the result of rate(http_requests_total{version="v2"}[5m])
 
 # Rollback Test
+# @gupta-deepa ➜ /workspaces/canary/canary-demo (main) $ time (helm rollback canary-demo 3 -n canary-demo)
+# Rollback was a success! Happy Helming!
+
+# real    0m0.155s
+# user    0m0.150s
+# sys     0m0.032s
+# @gupta-deepa ➜ /workspaces/canary/canary-demo (main) $ helm history canary-demo -n canary-demo
+# REVISION        UPDATED                         STATUS          CHART                   APP VERSION     DESCRIPTION     
+# 1               Sat Nov  9 20:19:09 2024        superseded      canary-demo-0.1.0       1.0.0           Install complete
+# 2               Sat Nov  9 23:08:23 2024        superseded      canary-demo-0.1.0       1.0.0           Upgrade complete
+# 3               Sat Nov  9 23:14:06 2024        superseded      canary-demo-0.1.0       1.0.0           Rollback to 1   
+# 4               Sat Nov  9 23:18:55 2024        superseded      canary-demo-0.1.0       1.0.0           Upgrade complete
+# 5               Sat Nov  9 23:53:44 2024        deployed        canary-demo-0.1.0       1.0.0           Rollback to 3   
+# @gupta-deepa ➜ /workspaces/canary/canary-demo (main) 
+
 rollback_test:
-  previous_revision: #TODO: Enter the revision number before rollback
-  rollback_command_used: #TODO: Enter the helm rollback command you used
-  time_to_rollback_seconds: #TODO: Enter how long the rollback took to complete
+  previous_revision: 4 #TODO: Enter the revision number before rollback
+  rollback_command_used: helm rollback canary-demo 1 -n canary-demo #TODO: Enter the helm rollback command you used
+  time_to_rollback_seconds: 0.155 #TODO: Enter how long the rollback took to complete
 
 # Error Budget Calculation (based on 99.9% SLO)
+# @gupta-deepa ➜ /workspaces/canary/canary-demo (main) $ python compute_error_budget.py
+# Calculating error budget...
+# Make sure you have port-forwarded Prometheus:
+# kubectl port-forward svc/prometheus-operated 9090:9090 -n canary-demo
+
+# Fetching data...
+# Handling connection for 9090
+# Handling connection for 9090
+
+# Results:
+# --------------------------------------------------
+# Monthly Error Budget (seconds): 2592.00
+# Remaining Error Budget (%): 100.00%
+
+# Detailed Statistics:
+# Total Requests (30d): 0
+# Total Errors (30d): 0
+
+# For answers.yml:
+# --------------------------------------------------
+# error_budget:
+#   monthly_error_budget_seconds: 2592.00
+#   remaining_error_budget_percentage: 100.00
+@gupta-deepa ➜ /workspaces/canary/canary-demo (main) $ 
 error_budget:
-  monthly_error_budget_seconds: #TODO: Calculate and enter the monthly error budget in seconds
-  remaining_error_budget_percentage: #TODO: Enter current remaining error budget percentage
+  monthly_error_budget_seconds: 2592.00 #TODO: Calculate and enter the monthly error budget in seconds
+  remaining_error_budget_percentage: 100.00% #TODO: Enter current remaining error budget percentage
 
 # Additional Observations
 observations:
-  unexpected_behaviors: #TODO: List any unexpected behaviors you observed
+  unexpected_behaviors: Prometheus dashboard was not able to load any graphs for me after entering the queries mentioned in the solution section #TODO: List any unexpected behaviors you observed
   suggested_improvements: #TODO: List any improvements you would suggest
